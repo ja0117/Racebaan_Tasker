@@ -13,6 +13,7 @@ namespace Model
         public IParticipant right;
         public int DistanceRight;
 
+        public SectionData() { }
         public SectionData(IParticipant left, int distanceLeft, IParticipant right, int distanceRight)
         {
             this.left = left;

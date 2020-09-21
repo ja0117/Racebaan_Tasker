@@ -9,13 +9,10 @@ namespace Model
         public string Name { get; set; }
         public LinkedList<Section> Sections { get; set; }
 
-        public Track(string name, SectionTypes[] sections)
+        public Track(string name, LinkedList<Section> sections)
         {
             this.Name = name;
-            foreach (var item in sections)
-            {
-                Sections.AddLast(new Section(item));
-            }
+            this.Sections = sections;
         }
     }
 }
