@@ -27,6 +27,42 @@ namespace ControllerTest
             }
         }
 
+        [Test]
+        public void NextTrack_OneInQueue_ReturnTrack()
+        {
+            Track t = new Track("Piet", new LinkedList<Section>());
+            _competition.Tracks.Enqueue(t);
 
+            Track result = this._competition.NextTrack();
+            Assert.AreEqual(t, result);
+        }
+        
+        [Test]
+        public void NextTrack_OneInQueue_RemoveTrackFromQueue()
+        {
+            Track t = new Track("Piet", new LinkedList<Section>());
+            _competition.Tracks.Enqueue(t);
+
+            Track result = this._competition.NextTrack();
+            result = this._competition.NextTrack();
+            Assert.IsNull(result);
+
+        }
+
+        [Test]
+        public void NextTrack_TwoInQueue_ReturnNextTrack()
+        {
+            Track t1 = new Track("Zwolle", new LinkedList<Section>());
+            Track t2 = new Track("Zandvoort", new LinkedList<Section>());
+            _competition.Tracks.Enqueue(t1);
+            _competition.Tracks.Enqueue(t2);
+
+            Track result = _competition.NextTrack();
+
+            // Shouldn't this be T2? since it's added last to the queue
+            Assert.AreEqual(t1, result);
+
+
+        }
     }
 }

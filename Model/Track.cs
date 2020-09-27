@@ -12,7 +12,19 @@ namespace Model
         public Track(string name, LinkedList<Section> sections)
         {
             this.Name = name;
-            this.Sections = sections;
+            this.Sections = Method(Sections);
+        }
+
+        // Level 4 task 1
+        public LinkedList<Section> Method(SectionTypes[] sectionTypes)
+        {
+            LinkedList<Section> section = new LinkedList<Section>();
+            foreach (SectionTypes sectionType in sectionTypes)
+            {
+                Section s = new Section(sectionType);
+                section.AddLast(s);
+            }
+            return section;
         }
     }
 }
