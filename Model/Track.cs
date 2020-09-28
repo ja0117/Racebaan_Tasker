@@ -9,14 +9,14 @@ namespace Model
         public string Name { get; set; }
         public LinkedList<Section> Sections { get; set; }
 
-        public Track(string name, LinkedList<Section> sections)
+        public Track(string name, SectionTypes[] sections)
         {
             this.Name = name;
-            this.Sections = Method(Sections);
+            this.Sections = SectionTypesToLinkedList(sections);
         }
 
         // Level 4 task 1
-        public LinkedList<Section> Method(SectionTypes[] sectionTypes)
+        public LinkedList<Section> SectionTypesToLinkedList(SectionTypes[] sectionTypes)
         {
             LinkedList<Section> section = new LinkedList<Section>();
             foreach (SectionTypes sectionType in sectionTypes)
