@@ -30,6 +30,7 @@ namespace Controller
 
         public static void AddTracksToCompetition()
         {
+
             CompetitionVal.Tracks.Enqueue(new Track("Graven", new SectionTypes[] {
                 SectionTypes.StartGrid,
                 SectionTypes.Straight,
@@ -38,10 +39,32 @@ namespace Controller
                 SectionTypes.RightCorner,
                 SectionTypes.Straight,
                 SectionTypes.Straight,
+                SectionTypes.LeftCorner,
+                SectionTypes.LeftCorner,
+                SectionTypes.Straight,
+                SectionTypes.Straight,
+                SectionTypes.Straight,
+                SectionTypes.Straight,
+                SectionTypes.RightCorner,
+                SectionTypes.RightCorner,
+                SectionTypes.Straight,
+                SectionTypes.Straight,
+                SectionTypes.LeftCorner,
+                SectionTypes.LeftCorner,
+                SectionTypes.Straight,
+                SectionTypes.Straight,
+                SectionTypes.Straight,
                 SectionTypes.Finish
             }));
-            CompetitionVal.Tracks.Enqueue(new Track("Lunar", new SectionTypes[] { }));
-            
+
+            CompetitionVal.Tracks.Enqueue(new Track("Lunar", new SectionTypes[] {
+                SectionTypes.StartGrid,
+                SectionTypes.RightCorner,
+                SectionTypes.RightCorner,
+                SectionTypes.RightCorner,
+                SectionTypes.RightCorner,
+                SectionTypes.Finish
+            }));
         }
 
         public static void NextRace()

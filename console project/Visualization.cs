@@ -30,66 +30,66 @@ namespace console_project
         #region Graphics
 
         private static string[] _start = {
-            "----",
-            "  | ",
-            "  | ",
-            "----"
+            "════",
+            "  ¦ ",
+            "  ¦ ",
+            "════"
         };
 
         private static string[] _finishHorizontal = {
-            "----",
-            "  # ",
-            "  # ",
-            "----"
+            "════",
+            "  ░ ",
+            "  ░ ",
+            "════"
         };
 
         private static string[] _finishVertical = {
-            "|  |",
-            "|##|",
-            "|  |",
-            "|  |"
+            "║  ║",
+            "║░░║",
+            "║  ║",
+            "║  ║"
         };
 
         private static string[] _straightHorizontal = {
-            "----",
+            "════",
             "    ",
             "    ",
-            "----"
+            "════"
         };
 
         private static string[] _straightVertical = {
-            "|  |",
-            "|  |",
-            "|  |",
-            "|  |"
+            "║  ║",
+            "║  ║",
+            "║  ║",
+            "║  ║"
         };
 
         private static string[] _cornerRightHtoV = {
-            @"--\ ",
-            @"   \",
-            @"\  |",
-            @"|  |"
+            @"══╗ ",
+            @"  ╚╗",
+            @"   ║",
+            @"╗  ║"
         };
 
         private static string[] _cornerRightVtoH = {
-            @"|  |",
-            @"/  |",
-            @"   /",
-            @"--/ "
-        };
-
-        private static string[] _cornerLeftHtoV = {
-            @"|  |",
-            @"|  \",
-            @"\   ",
-            @" \--"
+            @"╝  ║",
+            @"   ║",
+            @"  ╔╝",
+            @"══╝ "
         };
 
         private static string[] _cornerLeftVtoH = {
-            @" /--",
-            @"/   ",
-            @"|  /",
-            @"|  |"
+            @"║  ╚",
+            @"║   ",
+            @"╚╗  ",
+            @" ╚══"
+        };
+
+        private static string[] _cornerLeftHtoV = {
+            @" ╔══",
+            @"╔╝  ",
+            @"║   ",
+            @"║  ╔"
         };
 
 
@@ -119,16 +119,51 @@ namespace console_project
                         {
                             Console.Write(TrackPart[j][k].ToString());
                         }
-                        Console.SetCursorPosition(cursorX, cursorY);
-                    }
-                    if (track.Sections.First.Value.SectionType == SectionTypes.LeftCorner || track.Sections.First.Value.SectionType == SectionTypes.RightCorner) {
-                        if (isStraight) {
-                            isStraight = false;
+                        // If track is going East
+                        switch (Orientation) {
+                            case 0:
+                                Console.CursorTop += 1;
+                                Console.CursorLeft -= TrackSize;
+                                break;
+                            case 1:  // Going Straight works!
+                                Console.CursorTop += 1;
+                                Console.CursorLeft -= TrackSize;
+                                break;
+                            case 2:
+                                Console.CursorTop += 1;
+                                Console.CursorLeft -= TrackSize;
+                                break;
+                            case 3:
+                                Console.CursorTop += 1;
+                                Console.CursorLeft -= TrackSize;
+                                break;
                         }
-                        else {
-                            isStraight = true;
-                        }
+
                     }
+
+                    if (track.Sections.First.Value.SectionType == SectionTypes.LeftCorner) {
+                        ClampOrientationMinus();
+                    }
+                    if (track.Sections.First.Value.SectionType == SectionTypes.RightCorner) {
+                        ClampOrientationPlus();
+                    }
+
+                    switch (Orientation) {
+                        case 0:
+                            Console.SetCursorPosition(cursorX, cursorY -= TrackSize);
+                            break;
+                        case 1:
+                            Console.SetCursorPosition(cursorX += TrackSize, cursorY);
+                            break;
+                        case 2:
+                            Console.SetCursorPosition(cursorX, cursorY += TrackSize);
+                            break;
+                        case 3:
+                            Console.SetCursorPosition(cursorX -= TrackSize, cursorY);
+                            break;
+                    }
+
+                    
                     track.Sections.RemoveFirst();
                 }
                 //Draw Startgrid
@@ -146,37 +181,55 @@ namespace console_project
             {
                 case SectionTypes.Straight:
                     if (Orientation == 1 || Orientation == 3) {
-                        cursorX = cursorX + TrackSize;
                         return _straightHorizontal;
                     }
                     else {
-                        cursorY = cursorY + TrackSize;
                         return _straightVertical;
                     }
                 case SectionTypes.LeftCorner:
                     if (Orientation == 1 || Orientation == 3) {
-                        //cursorX = cursorX + 4;
                         return _cornerLeftHtoV;
                     }
                     else {
                         return _cornerLeftVtoH;
                     }
                 case SectionTypes.RightCorner:
-                    if (isStraight)
+                    if (Orientation == 1 || Orientation == 3) {
                         return _cornerRightHtoV;
-                    else
+                    }
+                    else {
                         return _cornerRightVtoH;
+                    }
                 case SectionTypes.StartGrid:
-                    cursorX = cursorX + TrackSize;
                     return _start;
                 case SectionTypes.Finish:
-                    if (isStraight)
+                    if (Orientation == 1 || Orientation == 3) {
                         return _finishHorizontal;
-                    else
+                    }
+                    else {
                         return _finishVertical;
+                    }
                 default:
                     return null;
             }
+        }
+
+        private static int ClampOrientationPlus() {
+            Orientation += 1;
+            if (Orientation == 4) {
+                Orientation = 0;
+                return Orientation;
+            }
+            return Orientation;
+        }
+
+        private static int ClampOrientationMinus() {
+            Orientation -= 1;
+            if (Orientation == -1) {
+                Orientation = 3;
+                return Orientation;
+            }
+            return Orientation;
         }
     }
 }
