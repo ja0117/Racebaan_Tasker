@@ -30,7 +30,11 @@ namespace ControllerTest
         [Test]
         public void NextTrack_OneInQueue_ReturnTrack()
         {
-            Track t = new Track("Piet", new LinkedList<Section>());
+            Track t = new Track("Piet", new SectionTypes[] {
+                SectionTypes.StartGrid,
+                SectionTypes.Straight,
+                SectionTypes.Finish
+            });
             _competition.Tracks.Enqueue(t);
 
             Track result = this._competition.NextTrack();
@@ -40,7 +44,11 @@ namespace ControllerTest
         [Test]
         public void NextTrack_OneInQueue_RemoveTrackFromQueue()
         {
-            Track t = new Track("Piet", new LinkedList<Section>());
+            Track t = new Track("Piet", new SectionTypes[] {
+                SectionTypes.StartGrid,
+                SectionTypes.Straight,
+                SectionTypes.Finish
+            });
             _competition.Tracks.Enqueue(t);
 
             Track result = this._competition.NextTrack();
@@ -52,8 +60,16 @@ namespace ControllerTest
         [Test]
         public void NextTrack_TwoInQueue_ReturnNextTrack()
         {
-            Track t1 = new Track("Zwolle", new LinkedList<Section>());
-            Track t2 = new Track("Zandvoort", new LinkedList<Section>());
+            Track t1 = new Track("Zwolle", new SectionTypes[] {
+                SectionTypes.StartGrid,
+                SectionTypes.Straight,
+                SectionTypes.Finish
+            });
+            Track t2 = new Track("Piet", new SectionTypes[] {
+                SectionTypes.StartGrid,
+                SectionTypes.Straight,
+                SectionTypes.Finish
+            });
             _competition.Tracks.Enqueue(t1);
             _competition.Tracks.Enqueue(t2);
 

@@ -22,26 +22,24 @@ namespace Controller
             // This kind of random is more random than new Random()
             _random = new Random(DateTime.Now.Millisecond);
 
+            // Initiate _positions
+            _positions = new Dictionary<Section, SectionData>();
+
+            PlaceParticipantsOnTrack(track, participants);
+
         }
 
-
-
-        //Getter for _positions
-        public Dictionary<Section, SectionData> GetPosition()
-        {
-            return _positions;
-        }
-
-        // Might be right? Check Tasker level 2 task 4
         public SectionData GetSectionData(Section section)
         {
-            if (_positions.ContainsKey(section)) 
+            if (_positions.TryGetValue(section, out SectionData data)) 
             {
-                return _positions[section];
+                return data;
+                //return _positions[section];
             }
             else
             {
                _positions.Add(section, new SectionData());
+               //_positions.Add(section, new SectionData());
                 return _positions[section];
             }
         }
@@ -53,6 +51,26 @@ namespace Controller
             {
                 participant.Equipment.Performance = rand.Next(1, 10);
                 participant.Equipment.Quality = rand.Next(1, 10);
+            }
+        }
+
+        public void PlaceParticipantsOnTrack(Track track, List<IParticipant> participants) {
+            foreach(Section section in track.Sections) {
+                if (participants.Count < 1) {
+                    continue;
+                }
+                if (section.SectionType == SectionTypes.StartGrid) {
+                    SectionData s = GetSectionData(section);
+                    foreach (IParticipant participant in Participants) {
+                        if (s.left == null) {
+                            s.left = participant;
+                            s.DistanceLeft = 0;
+                            continue;
+                        }
+                        s.right = participant;
+                        s.DistanceRight = 0;
+                    }
+                }
             }
         }
     }

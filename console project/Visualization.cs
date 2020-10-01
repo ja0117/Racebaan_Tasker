@@ -4,13 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 
 namespace console_project
 {
     public static class Visualization
     {
-        // Variable to see if we're going straight
-        private static bool isStraight = true;
 
         // Variable to determen orientation
         private static int Orientation = 1;
@@ -31,67 +30,94 @@ namespace console_project
 
         private static string[] _start = {
             "════",
-            "  ¦ ",
-            "  ¦ ",
+            "  1|",
+            " 2| ",
             "════"
         };
 
         private static string[] _finishHorizontal = {
             "════",
-            "  ░ ",
-            "  ░ ",
+            "  ░1",
+            "  ░2",
             "════"
         };
 
         private static string[] _finishVertical = {
             "║  ║",
             "║░░║",
-            "║  ║",
+            "║12║",
             "║  ║"
         };
 
         private static string[] _straightHorizontal = {
             "════",
-            "    ",
-            "    ",
+            "  1 ",
+            "  2 ",
             "════"
         };
 
         private static string[] _straightVertical = {
+            "║1 ║",
             "║  ║",
-            "║  ║",
-            "║  ║",
+            "║ 2║",
             "║  ║"
         };
 
-        private static string[] _cornerRightHtoV = {
+        private static string[] _cornerRight0 = {
+            @" ╔══",
+            @"╔╝1 ",
+            @"║  2",
+            @"║  ╔"
+        };
+
+        private static string[] _cornerRight1 = {
             @"══╗ ",
-            @"  ╚╗",
-            @"   ║",
+            @" 1╚╗",
+            @" 2 ║",
             @"╗  ║"
         };
 
-        private static string[] _cornerRightVtoH = {
-            @"╝  ║",
-            @"   ║",
+        private static string[] _cornerRight2 = {
+            @"╝1 ║",
+            @"  2║",
             @"  ╔╝",
             @"══╝ "
         };
 
-        private static string[] _cornerLeftVtoH = {
-            @"║  ╚",
+        private static string[] _cornerRight3 = {
+            @"║ 1╚",
             @"║   ",
-            @"╚╗  ",
+            @"╚╗ 2",
             @" ╚══"
         };
 
-        private static string[] _cornerLeftHtoV = {
+        private static string[] _cornerLeft3 = {
             @" ╔══",
-            @"╔╝  ",
-            @"║   ",
+            @"╔╝ 1",
+            @"║ 2 ",
             @"║  ╔"
         };
 
+        private static string[] _cornerLeft1 = {
+            @"╝1 ║",
+            @"  2║",
+            @"  ╔╝",
+            @"══╝ "
+        };
+
+        private static string[] _cornerLeft2 = {
+            @"║1 ╚",
+            @"║   ",
+            @"╚╗ 2",
+            @" ╚══"
+        };
+
+        private static string[] _cornerLeft0 = {
+            @"══╗ ",
+            @"2 ╚╗",
+            @"   ║",
+            @"╗1 ║"
+        };
 
         #endregion
 
@@ -112,13 +138,14 @@ namespace console_project
                 {
                     // Get current track part
                     string[] TrackPart = GetSectionType(track.Sections.First.Value.SectionType);
-
+                    
                     for (int j = 0; j < _start.Length; j++)
                     {
                         for (int k = 0; k < _start[j].Length; k++)
                         {
                             Console.Write(TrackPart[j][k].ToString());
                         }
+                        Thread.Sleep(10);
                         // If track is going East
                         switch (Orientation) {
                             case 0:
@@ -175,6 +202,10 @@ namespace console_project
             }
         }
 
+        public static string AddParticipants(string s, IParticipant participant) {
+            return null;
+        }
+
         private static string[] GetSectionType(SectionTypes s)
         {
             switch (s)
@@ -187,18 +218,35 @@ namespace console_project
                         return _straightVertical;
                     }
                 case SectionTypes.LeftCorner:
-                    if (Orientation == 1 || Orientation == 3) {
-                        return _cornerLeftHtoV;
-                    }
-                    else {
-                        return _cornerLeftVtoH;
+                    switch (Orientation) {
+                        case 0:
+                            return _cornerLeft0;
+                        case 1:
+                            return _cornerLeft1;
+                        case 2:
+                            return _cornerLeft2;
+                        case 3:
+                            return _cornerLeft3;
+                        default:
+                            return null;
                     }
                 case SectionTypes.RightCorner:
-                    if (Orientation == 1 || Orientation == 3) {
-                        return _cornerRightHtoV;
-                    }
-                    else {
-                        return _cornerRightVtoH;
+                    switch (Orientation) {
+                        case 0:
+                            return _cornerRight0;
+                            break;
+                        case 1:
+                            return _cornerRight1;
+                            break;
+                        case 2:
+                            return _cornerRight2;
+                            break;
+                        case 3:
+                            return _cornerRight3;
+                            break;
+                        default:
+                            return null;
+                            break;
                     }
                 case SectionTypes.StartGrid:
                     return _start;
