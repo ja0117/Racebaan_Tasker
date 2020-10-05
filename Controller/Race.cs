@@ -4,6 +4,10 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Model;
 
+// Lvl 5 task 1
+using System.Timers;
+using System.Linq;
+
 namespace Controller
 {
     public class Race
@@ -14,6 +18,10 @@ namespace Controller
 
         private Random _random;
         private Dictionary<Section, SectionData> _positions;
+
+        private Timer t;
+
+        public event EventHandler<DriversChangedEventArgs> DriversChanged;
 
         public Race(Track track, List<IParticipant> participants)
         {
@@ -27,6 +35,9 @@ namespace Controller
 
             PlaceParticipantsOnTrack(track, participants);
 
+            t = new Timer(200);
+            t.Elapsed += OnTimedEvent;
+
         }
 
         public SectionData GetSectionData(Section section)
@@ -34,12 +45,10 @@ namespace Controller
             if (_positions.TryGetValue(section, out SectionData data)) 
             {
                 return data;
-                //return _positions[section];
             }
             else
             {
-               _positions.Add(section, new SectionData());
-               //_positions.Add(section, new SectionData());
+               _positions.Add(section, new SectionData(null, 0, null, 0));
                 return _positions[section];
             }
         }
@@ -62,15 +71,65 @@ namespace Controller
                 if (section.SectionType == SectionTypes.StartGrid) {
                     SectionData s = GetSectionData(section);
                     foreach (IParticipant participant in Participants) {
-                        if (s.left == null) {
-                            s.left = participant;
-                            s.DistanceLeft = 0;
+                        if (s.Left == null) {
+                            s.Left = participant;
                             continue;
                         }
-                        s.right = participant;
-                        s.DistanceRight = 0;
+                        s.Right = participant;
                     }
                 }
+            }
+        }
+
+        public void StartTimer() {
+            this.t.Start();
+        }
+
+        // Runs constantly whenever timer is started
+        public void OnTimedEvent(object source, ElapsedEventArgs e) {
+            int sectionSize = 100;
+            for (int i = _positions.Count - 1; i >= 0; i--) {
+                var sData = _positions.ElementAt(i).Value;
+                if (sData.Left != null) {
+                    var distanceTraveled = sData.Left.Equipment.Performance * sData.Left.Equipment.Speed;
+                    sData.DistanceLeft += distanceTraveled;
+
+                    if (sData.DistanceLeft >= sectionSize) {
+                        var nextSection = _positions.Count <= i + 1 ? _positions.ElementAt(0).Key : _positions.ElementAt(i + 1).Key;
+                        ToNextSection(sData, 0, nextSection);
+                    }
+                }
+                if (sData.Right != null) {
+                    var distanceTraveled = sData.Right.Equipment.Performance * sData.Right.Equipment.Speed;
+                    sData.DistanceRight += distanceTraveled;
+
+                    if (sData.DistanceRight >= sectionSize) {
+                        var nextSection = _positions.Count <= i + 1 ? _positions.ElementAt(0).Key : _positions.ElementAt(i + 1).Key;
+
+                        ToNextSection(sData, 1, nextSection);
+                    }
+                }
+            }
+            var eventArgs = new DriversChangedEventArgs { Track = Data.CurrentRace.Track };
+            DriversChanged?.Invoke(source, eventArgs);
+
+            //Console.WriteLine($"Timer Elapsed: {e.SignalTime.Ticks}");
+        }
+
+        public void ToNextSection(SectionData sectionData, int side, Section nextSection) {
+            if (side == 0) {
+                var nextSData = GetSectionData(nextSection);
+                if (nextSData.Left != null) return;
+                nextSData.Left = sectionData.Left;
+                sectionData.Left = null;
+                sectionData.DistanceLeft = 0;
+            }
+            else {
+                var nextSData = GetSectionData(nextSection);
+                if (nextSData.Right != null) return;
+                nextSData.Right = sectionData.Right;
+                sectionData.Right = null;
+                sectionData.DistanceRight = 0;
             }
         }
     }

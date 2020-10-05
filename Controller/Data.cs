@@ -32,7 +32,7 @@ namespace Controller
         {
 
             CompetitionVal.Tracks.Enqueue(new Track("Graven", new SectionTypes[] {
-                SectionTypes.StartGrid,
+                SectionTypes.Finish,
                 SectionTypes.Straight,
                 SectionTypes.Straight,
                 SectionTypes.RightCorner,
@@ -83,7 +83,11 @@ namespace Controller
                 SectionTypes.Straight,
                 SectionTypes.LeftCorner,
                 SectionTypes.Straight,
-                SectionTypes.Finish
+                SectionTypes.Straight,
+                SectionTypes.RightCorner,
+                SectionTypes.RightCorner,
+                SectionTypes.Straight,
+                SectionTypes.StartGrid
             }));
 
             CompetitionVal.Tracks.Enqueue(new Track("Lunar", new SectionTypes[] {

@@ -1,4 +1,5 @@
-﻿using Model;
+﻿using Controller;
+using Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace console_project
 {
     public static class Visualization
     {
+
+        private static Race Race;
 
         // Variable to determen orientation
         private static int Orientation = 1;
@@ -31,7 +34,7 @@ namespace console_project
         private static string[] _start = {
             "════",
             "  1|",
-            " 2| ",
+            "2|  ",
             "════"
         };
 
@@ -120,91 +123,110 @@ namespace console_project
         };
 
         #endregion
-
-        public static void Initialize()
+        
+        public static void Initialize(Race race)
         {
-            
+            Race = race;
+            DrawTrack(Race.Track);
+            Data.CurrentRace.DriversChanged += DriversChanged;
         }
 
         public static void DrawTrack(Track track)
         {
             //Console.SetCursorPosition(cursorX, cursorY);
-            if (track.Sections.First.Value.SectionType == SectionTypes.StartGrid && track.Sections.Last.Value.SectionType == SectionTypes.Finish)
-            {
-                // Set Startposition Cursor
-                Console.SetCursorPosition(cursorX, cursorY);
-                // Draw Each individual SectionType
-                while (track.Sections.Count > 0)
-                {
-                    // Get current track part
-                    string[] TrackPart = GetSectionType(track.Sections.First.Value.SectionType);
-                    
-                    for (int j = 0; j < _start.Length; j++)
-                    {
-                        for (int k = 0; k < _start[j].Length; k++)
-                        {
-                            Console.Write(TrackPart[j][k].ToString());
-                        }
-                        Thread.Sleep(10);
-                        // If track is going East
-                        switch (Orientation) {
-                            case 0:
-                                Console.CursorTop += 1;
-                                Console.CursorLeft -= TrackSize;
-                                break;
-                            case 1:  // Going Straight works!
-                                Console.CursorTop += 1;
-                                Console.CursorLeft -= TrackSize;
-                                break;
-                            case 2:
-                                Console.CursorTop += 1;
-                                Console.CursorLeft -= TrackSize;
-                                break;
-                            case 3:
-                                Console.CursorTop += 1;
-                                Console.CursorLeft -= TrackSize;
-                                break;
-                        }
 
-                    }
+            // Set Startposition Cursor
+            Console.SetCursorPosition(cursorX, cursorY);
+            // Draw Each individual SectionType
 
-                    if (track.Sections.First.Value.SectionType == SectionTypes.LeftCorner) {
-                        ClampOrientationMinus();
-                    }
-                    if (track.Sections.First.Value.SectionType == SectionTypes.RightCorner) {
-                        ClampOrientationPlus();
-                    }
+            // Get current track part
+            //string[] TrackPart = GetSectionType(track.Sections.First.Value.SectionType);
+
+            foreach (Section section in Race.Track.Sections) {
+                string[] TrackPart = GetSectionType(section.SectionType);
+                TrackPart = AddParticipants(section, TrackPart);
+                foreach (string line in TrackPart) {
+                    Console.Write(line);
+                    //Thread.Sleep(10);
 
                     switch (Orientation) {
                         case 0:
-                            Console.SetCursorPosition(cursorX, cursorY -= TrackSize);
+                            Console.CursorTop += 1;
+                            Console.CursorLeft -= TrackSize;
                             break;
-                        case 1:
-                            Console.SetCursorPosition(cursorX += TrackSize, cursorY);
+                        case 1:  // Going Straight works!
+                            Console.CursorTop += 1;
+                            Console.CursorLeft -= TrackSize;
                             break;
                         case 2:
-                            Console.SetCursorPosition(cursorX, cursorY += TrackSize);
+                            Console.CursorTop += 1;
+                            Console.CursorLeft -= TrackSize;
                             break;
                         case 3:
-                            Console.SetCursorPosition(cursorX -= TrackSize, cursorY);
+                            Console.CursorTop += 1;
+                            Console.CursorLeft -= TrackSize;
                             break;
                     }
-
-                    
-                    track.Sections.RemoveFirst();
                 }
-                //Draw Startgrid
-                
+                if (section.SectionType == SectionTypes.LeftCorner) {
+                    ClampOrientationMinus();
+                }
+                if (section.SectionType == SectionTypes.RightCorner) {
+                    ClampOrientationPlus();
+                }
+
+                switch (Orientation) {
+                    case 0:
+                        Console.SetCursorPosition(cursorX, cursorY -= TrackSize);
+                        break;
+                    case 1:
+                        Console.SetCursorPosition(cursorX += TrackSize, cursorY);
+                        break;
+                    case 2:
+                        Console.SetCursorPosition(cursorX, cursorY += TrackSize);
+                        break;
+                    case 3:
+                        Console.SetCursorPosition(cursorX -= TrackSize, cursorY);
+                        break;
+                }
             }
-            else
-            {
-                Console.WriteLine("Track does not contain Start and / or Finish");
-            }
+            
         }
 
-        public static string AddParticipants(string s, IParticipant participant) {
-            return null;
+        public static string[] AddParticipants(Section section, string[] trackPart) {
+            SectionData sectionData = Race.GetSectionData(section);
+            
+            if (sectionData.Left != null) {
+                for (int i = 0; i < trackPart.Length; i++) {
+                    trackPart[i] = trackPart[i].Replace("1", sectionData.Left.Name.Substring(0, 1));
+                }
+            }
+            else {
+                for (int i = 0; i < trackPart.Length; i++) {
+                    trackPart[i] = trackPart[i].Replace("1", " ");
+                }
+            }
+
+
+            if (sectionData.Right != null) {
+                for (int i = 0; i < trackPart.Length; i++) {
+                    trackPart[i] = trackPart[i].Replace("2", sectionData.Right.Name.Substring(0, 1));
+                }
+            }
+            else {
+                for (int i = 0; i < trackPart.Length; i++) {
+                    trackPart[i] = trackPart[i].Replace("2", " ");
+                }
+            }
+            return trackPart;
         }
+
+
+        //Event handler for DriversChanged
+        private static void DriversChanged(object source, DriversChangedEventArgs e) {
+            DrawTrack(e.Track);
+        }
+
 
         private static string[] GetSectionType(SectionTypes s)
         {
@@ -234,19 +256,14 @@ namespace console_project
                     switch (Orientation) {
                         case 0:
                             return _cornerRight0;
-                            break;
                         case 1:
                             return _cornerRight1;
-                            break;
                         case 2:
                             return _cornerRight2;
-                            break;
                         case 3:
                             return _cornerRight3;
-                            break;
                         default:
                             return null;
-                            break;
                     }
                 case SectionTypes.StartGrid:
                     return _start;

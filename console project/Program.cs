@@ -13,7 +13,8 @@ namespace console_project
             Controller.Data.NextRace();
             Console.WriteLine($"{Controller.Data.CurrentRace.Track.Name}");
             // DrawTrack
-            Visualization.DrawTrack(Controller.Data.CurrentRace.Track);
+            Visualization.Initialize(Controller.Data.CurrentRace);
+            Data.CurrentRace.StartTimer();
 
             for(; ; )
             {
