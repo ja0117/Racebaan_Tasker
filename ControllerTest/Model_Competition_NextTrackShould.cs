@@ -77,8 +77,6 @@ namespace ControllerTest
 
             // Shouldn't this be T2? since it's added last to the queue
             Assert.AreEqual(t1, result);
-
-
         }
     }
 }

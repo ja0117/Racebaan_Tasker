@@ -22,8 +22,8 @@ namespace Controller
         // Adding a few Participants to the Competition
         public static void AddParticipants()
         {
-            CompetitionVal.Participants.Add(new Driver("Gabe Newell",      0, new Car(1, 1, 9, false), TeamColors.Blue));
-            CompetitionVal.Participants.Add(new Driver("Travis Scott",     0, new Car(1, 9, 7, false), TeamColors.Green));
+            CompetitionVal.Participants.Add(new Driver("Gabe Newell",      0, new Car(10, 5, 8, false), TeamColors.Blue));
+            CompetitionVal.Participants.Add(new Driver("Travis Scott",     0, new Car(6, 10, 10, false), TeamColors.Green));
             //CompetitionVal.Participants.Add(new Driver("Pierce Brosnan",   0, new Car(1, 5, 6, false), TeamColors.Red));
             //CompetitionVal.Participants.Add(new Driver("Hope Oscott",      0, new Car(1, 6, 5, false), TeamColors.Yellow));
         }
@@ -32,7 +32,7 @@ namespace Controller
         {
 
             CompetitionVal.Tracks.Enqueue(new Track("Graven", new SectionTypes[] {
-                SectionTypes.Finish,
+                SectionTypes.StartGrid,
                 SectionTypes.Straight,
                 SectionTypes.Straight,
                 SectionTypes.RightCorner,
@@ -87,7 +87,7 @@ namespace Controller
                 SectionTypes.RightCorner,
                 SectionTypes.RightCorner,
                 SectionTypes.Straight,
-                SectionTypes.StartGrid
+                SectionTypes.Finish
             }));
 
             CompetitionVal.Tracks.Enqueue(new Track("Lunar", new SectionTypes[] {

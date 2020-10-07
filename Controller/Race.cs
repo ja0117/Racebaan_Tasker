@@ -29,13 +29,13 @@ namespace Controller
             Participants = participants;
             // This kind of random is more random than new Random()
             _random = new Random(DateTime.Now.Millisecond);
-
+            //RandomizeEquipment();
             // Initiate _positions
             _positions = new Dictionary<Section, SectionData>();
 
             PlaceParticipantsOnTrack(track, participants);
 
-            t = new Timer(200);
+            t = new Timer(100);
             t.Elapsed += OnTimedEvent;
 
         }

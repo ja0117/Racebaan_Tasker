@@ -29,6 +29,9 @@ namespace console_project
         // Width / Height of track
         private static int TrackSize = 4;
 
+        //Score for participants, keeps track of the laps
+        private static Dictionary<IParticipant, int> LapsFinished;
+
         #region Graphics
 
         private static string[] _start = {
@@ -127,14 +130,22 @@ namespace console_project
         public static void Initialize(Race race)
         {
             Race = race;
-            DrawTrack(Race.Track);
             Data.CurrentRace.DriversChanged += DriversChanged;
+            LapsFinished = new Dictionary<IParticipant, int>();
+            AddParticipantsToScoreList();
+            DrawTrack(Race.Track);
+
+        }
+
+        private static void AddParticipantsToScoreList() {
+            foreach (IParticipant p in Race.Participants) {
+                LapsFinished.Add(p, 0);
+            }
         }
 
         public static void DrawTrack(Track track)
         {
-            //Console.SetCursorPosition(cursorX, cursorY);
-
+            DrawScore();
             // Set Startposition Cursor
             Console.SetCursorPosition(cursorX, cursorY);
             // Draw Each individual SectionType
@@ -142,17 +153,20 @@ namespace console_project
             // Get current track part
             //string[] TrackPart = GetSectionType(track.Sections.First.Value.SectionType);
 
+            Console.SetCursorPosition(cursorX, cursorY);
+
             foreach (Section section in Race.Track.Sections) {
                 string[] TrackPart = GetSectionType(section.SectionType);
-                TrackPart = AddParticipants(section, TrackPart);
+                // If one of the participants is finished
+                IsFinished(section, TrackPart);
                 foreach (string line in TrackPart) {
-                    Console.Write(line);
-                    //Thread.Sleep(10);
-
+                    string replacedLine = AddParticipants(section, line);
+                    Console.Write(replacedLine);
                     switch (Orientation) {
                         case 0:
                             Console.CursorTop += 1;
                             Console.CursorLeft -= TrackSize;
+                            //Console.SetCursorPosition(cursorX -= TrackSize, cursorY += 1)
                             break;
                         case 1:  // Going Straight works!
                             Console.CursorTop += 1;
@@ -168,6 +182,7 @@ namespace console_project
                             break;
                     }
                 }
+
                 if (section.SectionType == SectionTypes.LeftCorner) {
                     ClampOrientationMinus();
                 }
@@ -190,37 +205,43 @@ namespace console_project
                         break;
                 }
             }
-            
         }
 
-        public static string[] AddParticipants(Section section, string[] trackPart) {
+        public static string AddParticipants(Section section, string trackPart) {
             SectionData sectionData = Race.GetSectionData(section);
-            
-            if (sectionData.Left != null) {
-                for (int i = 0; i < trackPart.Length; i++) {
-                    trackPart[i] = trackPart[i].Replace("1", sectionData.Left.Name.Substring(0, 1));
-                }
-            }
-            else {
-                for (int i = 0; i < trackPart.Length; i++) {
-                    trackPart[i] = trackPart[i].Replace("1", " ");
-                }
-            }
 
+            var replace = new string(trackPart);
 
-            if (sectionData.Right != null) {
-                for (int i = 0; i < trackPart.Length; i++) {
-                    trackPart[i] = trackPart[i].Replace("2", sectionData.Right.Name.Substring(0, 1));
-                }
-            }
-            else {
-                for (int i = 0; i < trackPart.Length; i++) {
-                    trackPart[i] = trackPart[i].Replace("2", " ");
-                }
-            }
-            return trackPart;
+            replace = replace.Replace("1", sectionData.Left != null ? sectionData.Left.Name.ToCharArray()[0].ToString() : " ");
+            replace = replace.Replace("2", sectionData.Right != null ? sectionData.Right.Name.ToCharArray()[0].ToString() : " ");
+
+            return replace;
+
         }
 
+        public static void IsFinished(Section section, string[] trackPart) {
+            SectionData sectionData = Race.GetSectionData(section);
+            if (trackPart == _finishHorizontal || trackPart == _finishVertical) {
+                if (sectionData.Left != null && sectionData.Right != null) {
+                    if (LapsFinished.ContainsKey(sectionData.Right)) {
+                        LapsFinished[sectionData.Right] += 1;
+                    }
+                    if (LapsFinished.ContainsKey(sectionData.Left)) {
+                        LapsFinished[sectionData.Left] += 1;
+                    }
+                }
+                if (sectionData.Left != null && sectionData.Right == null) {
+                    if (LapsFinished.ContainsKey(sectionData.Left)) {
+                        LapsFinished[sectionData.Left] += 1;
+                    }
+                }
+                if (sectionData.Right != null && sectionData.Left == null) {
+                    if (LapsFinished.ContainsKey(sectionData.Right)) {
+                        LapsFinished[sectionData.Right] += 1;
+                    }
+                }
+            }
+        }
 
         //Event handler for DriversChanged
         private static void DriversChanged(object source, DriversChangedEventArgs e) {
@@ -277,6 +298,18 @@ namespace console_project
                 default:
                     return null;
             }
+        }
+
+        private static void DrawScore() {
+            int si = 2;
+            Console.SetCursorPosition(65, 2);
+            Console.Write("========= Max Laps: 3 =========");
+            foreach (var item in LapsFinished) {
+                Console.SetCursorPosition(65, si += 1);
+                Console.Write($"={item.Key.Name} ".PadRight(20) + $"Laps: {item.Value}".PadRight(10) + "=");
+            }
+            Console.SetCursorPosition(65, si += 1);
+            Console.Write("===============================");
         }
 
         private static int ClampOrientationPlus() {

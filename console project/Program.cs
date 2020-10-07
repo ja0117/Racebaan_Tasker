@@ -13,6 +13,10 @@ namespace console_project
             Controller.Data.NextRace();
             Console.WriteLine($"{Controller.Data.CurrentRace.Track.Name}");
             // DrawTrack
+
+            // Hide cursor because it's annoying
+            Console.CursorVisible = false;
+
             Visualization.Initialize(Controller.Data.CurrentRace);
             Data.CurrentRace.StartTimer();
 
