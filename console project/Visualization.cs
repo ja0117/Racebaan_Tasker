@@ -29,9 +29,6 @@ namespace console_project
         // Width / Height of track
         private static int TrackSize = 4;
 
-        //Score for participants, keeps track of the laps
-        private static Dictionary<IParticipant, int> LapsFinished;
-
         #region Graphics
 
         private static string[] _start = {
@@ -131,7 +128,7 @@ namespace console_project
         {
             Race = race;
             Data.CurrentRace.DriversChanged += DriversChanged;
-            LapsFinished = new Dictionary<IParticipant, int>();
+            Race.LapsFinished = new Dictionary<IParticipant, int>();
             AddParticipantsToScoreList();
             DrawTrack(Race.Track);
 
@@ -139,7 +136,7 @@ namespace console_project
 
         private static void AddParticipantsToScoreList() {
             foreach (IParticipant p in Race.Participants) {
-                LapsFinished.Add(p, 0);
+                Race.LapsFinished.Add(p, 0);
             }
         }
 
@@ -158,7 +155,6 @@ namespace console_project
             foreach (Section section in Race.Track.Sections) {
                 string[] TrackPart = GetSectionType(section.SectionType);
                 // If one of the participants is finished
-                IsFinished(section, TrackPart);
                 foreach (string line in TrackPart) {
                     string replacedLine = AddParticipants(section, line);
                     Console.Write(replacedLine);
@@ -219,29 +215,7 @@ namespace console_project
 
         }
 
-        public static void IsFinished(Section section, string[] trackPart) {
-            SectionData sectionData = Race.GetSectionData(section);
-            if (trackPart == _finishHorizontal || trackPart == _finishVertical) {
-                if (sectionData.Left != null && sectionData.Right != null) {
-                    if (LapsFinished.ContainsKey(sectionData.Right)) {
-                        LapsFinished[sectionData.Right] += 1;
-                    }
-                    if (LapsFinished.ContainsKey(sectionData.Left)) {
-                        LapsFinished[sectionData.Left] += 1;
-                    }
-                }
-                if (sectionData.Left != null && sectionData.Right == null) {
-                    if (LapsFinished.ContainsKey(sectionData.Left)) {
-                        LapsFinished[sectionData.Left] += 1;
-                    }
-                }
-                if (sectionData.Right != null && sectionData.Left == null) {
-                    if (LapsFinished.ContainsKey(sectionData.Right)) {
-                        LapsFinished[sectionData.Right] += 1;
-                    }
-                }
-            }
-        }
+        
 
         //Event handler for DriversChanged
         private static void DriversChanged(object source, DriversChangedEventArgs e) {
@@ -304,7 +278,7 @@ namespace console_project
             int si = 2;
             Console.SetCursorPosition(65, 2);
             Console.Write("========= Max Laps: 3 =========");
-            foreach (var item in LapsFinished) {
+            foreach (var item in Race.LapsFinished) {
                 Console.SetCursorPosition(65, si += 1);
                 Console.Write($"={item.Key.Name} ".PadRight(20) + $"Laps: {item.Value}".PadRight(10) + "=");
             }
